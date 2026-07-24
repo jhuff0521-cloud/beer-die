@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #ffffff;
+  --color-bg-surface: #f5f5f2;
+  --color-bg-raised: #ffffff;
+  --color-bg-border: #e3e2dd;
+
+  --color-accent: #d6202a;
+  --color-accent-dim: #a3151d;
+  --color-accent-bright: #ef4b52;
+
+  --color-ink: #15140f;
+  --color-ink-dim: #56554e;
+  --color-ink-faint: #8f8d84;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-bg-border);
+  border: 2px solid var(--color-bg);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-faint);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* tabular figures for dense stat tables/numbers */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+}
