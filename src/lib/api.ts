@@ -6,6 +6,7 @@ import type {
   PlayerStanding,
   PlayerSummary,
 } from "./types";
+import { normalizeOutcome, normalizePBPEvents } from "./outcomes";
 
 export const APPS_SCRIPT_URL =
   process.env.NEXT_PUBLIC_APPS_SCRIPT_URL ??
@@ -28,14 +29,6 @@ async function callAppsScript<T>(
   }
 }
 
-export async function getStandings(): Promise<PlayerStanding[]> {
-  const data = await callAppsScript<{ status: string; standings: PlayerStanding[] }>(
-    { action: "get_standings" },
-    60
-  );
-  return data?.standings ?? [];
-}
-
 export async function getPlayers(): Promise<PlayerSummary[]> {
   const data = await callAppsScript<{ status: string; players: PlayerSummary[] }>(
     { action: "get_players" },
@@ -44,12 +37,46 @@ export async function getPlayers(): Promise<PlayerSummary[]> {
   return data?.players ?? [];
 }
 
+/**
+ * The stats sheet ("player stat input") that get_standings/get_player read from has no photo
+ * column — only the roster sheet behind get_players does. This backfills photos by name so
+ * every page shows real photos instead of initials whenever the roster has one on file.
+ */
+async function getPlayerPhotoMap(): Promise<Map<string, string>> {
+  const players = await getPlayers();
+  const map = new Map<string, string>();
+  for (const p of players) {
+    if (p.photo) map.set(p.name.toLowerCase().trim(), p.photo);
+  }
+  return map;
+}
+
+function withPhotoFallback<T extends { name: string; photo: string | null }>(
+  row: T,
+  photoMap: Map<string, string>
+): T {
+  if (row.photo) return row;
+  const fallback = photoMap.get(row.name.toLowerCase().trim());
+  return fallback ? { ...row, photo: fallback } : row;
+}
+
+export async function getStandings(): Promise<PlayerStanding[]> {
+  const [data, photoMap] = await Promise.all([
+    callAppsScript<{ status: string; standings: PlayerStanding[] }>({ action: "get_standings" }, 60),
+    getPlayerPhotoMap(),
+  ]);
+  return (data?.standings ?? []).map((p) => withPhotoFallback(p, photoMap));
+}
+
 export async function getPlayer(name: string): Promise<PlayerStanding | null> {
-  const data = await callAppsScript<{ status: string; player: PlayerStanding | null }>(
-    { action: "get_player", name },
-    60
-  );
-  return data?.player ?? null;
+  const [data, photoMap] = await Promise.all([
+    callAppsScript<{ status: string; player: PlayerStanding | null }>({ action: "get_player", name }, 60),
+    getPlayerPhotoMap(),
+  ]);
+  const player = data?.player ?? null;
+  if (!player) return null;
+  const withPhoto = withPhotoFallback(player, photoMap);
+  return { ...withPhoto, pbp: normalizePBPEvents(withPhoto.pbp) };
 }
 
 export async function getPBPHistory(player: string): Promise<PBPEvent[]> {
@@ -57,7 +84,7 @@ export async function getPBPHistory(player: string): Promise<PBPEvent[]> {
     { action: "get_pbp_history", player },
     60
   );
-  return data?.pbp ?? [];
+  return normalizePBPEvents(data?.pbp);
 }
 
 function normalizePartnership(raw: Record<string, unknown>): Partnership | null {
@@ -82,21 +109,39 @@ function normalizePartnership(raw: Record<string, unknown>): Partnership | null 
   };
 }
 
+function withPartnershipPhotoFallback(p: Partnership, photoMap: Map<string, string>): Partnership {
+  return {
+    ...p,
+    photoA: p.photoA ?? photoMap.get(p.playerA.toLowerCase().trim()) ?? null,
+    photoB: p.photoB ?? photoMap.get(p.playerB.toLowerCase().trim()) ?? null,
+  };
+}
+
 export async function getPartnerships(): Promise<Partnership[]> {
-  const data = await callAppsScript<{ status: string; partnerships: Record<string, unknown>[] }>(
-    { action: "get_partnerships" },
-    60
-  );
-  return (data?.partnerships ?? []).map(normalizePartnership).filter((p): p is Partnership => p !== null);
+  const [data, photoMap] = await Promise.all([
+    callAppsScript<{ status: string; partnerships: Record<string, unknown>[] }>(
+      { action: "get_partnerships" },
+      60
+    ),
+    getPlayerPhotoMap(),
+  ]);
+  return (data?.partnerships ?? [])
+    .map(normalizePartnership)
+    .filter((p): p is Partnership => p !== null)
+    .map((p) => withPartnershipPhotoFallback(p, photoMap));
 }
 
 export async function getPartnership(nameA: string, nameB: string): Promise<Partnership | null> {
-  const data = await callAppsScript<{ status: string; partnership: Record<string, unknown> | null }>(
-    { action: "get_partnership", names: `${nameA},${nameB}` },
-    60
-  );
+  const [data, photoMap] = await Promise.all([
+    callAppsScript<{ status: string; partnership: Record<string, unknown> | null }>(
+      { action: "get_partnership", names: `${nameA},${nameB}` },
+      60
+    ),
+    getPlayerPhotoMap(),
+  ]);
   if (!data?.partnership) return null;
-  return normalizePartnership(data.partnership);
+  const normalized = normalizePartnership(data.partnership);
+  return normalized ? withPartnershipPhotoFallback(normalized, photoMap) : null;
 }
 
 export async function getNews(): Promise<NewsArticle[]> {
@@ -108,7 +153,16 @@ export async function getNews(): Promise<NewsArticle[]> {
 }
 
 export async function getLiveGame(): Promise<LiveResponse | null> {
-  return callAppsScript<LiveResponse>({}, false);
+  const data = await callAppsScript<LiveResponse>({}, false);
+  if (!data?.game) return data;
+  return {
+    ...data,
+    game: {
+      ...data.game,
+      lastOutcome: normalizeOutcome(data.game.lastOutcome),
+      pbp: normalizePBPEvents(data.game.pbp),
+    },
+  };
 }
 
 export function partnershipSlug(a: string, b: string) {

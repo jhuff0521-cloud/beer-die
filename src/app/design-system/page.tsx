@@ -161,7 +161,7 @@ export default function DesignSystemPage() {
           </select>
         </div>
         <SprayChart events={careerEvents} view={view} filter={filter} showGrid />
-        {view === "spray" && <SprayLegend className="mt-3" />}
+        <SprayLegend className="mt-3" />
       </section>
 
       {/* Live scoreboard preview */}

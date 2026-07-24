@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/PartnershipTable";
 import { APPS_SCRIPT_URL } from "@/lib/api";
 import { fetchFromSheet } from "@/lib/jsonp";
 import { winProb } from "@/lib/winProb";
+import { normalizeOutcome, normalizePBPEvents } from "@/lib/outcomes";
 import type { LiveResponse, PBPEvent } from "@/lib/types";
 import { clsx } from "@/lib/clsx";
 
@@ -26,8 +27,16 @@ export function LiveView({ initial }: { initial: LiveResponse | null }) {
 
     async function poll() {
       try {
-        const next = await fetchFromSheet<LiveResponse>(APPS_SCRIPT_URL);
-        if (cancelled || !next?.game) return;
+        const raw = await fetchFromSheet<LiveResponse>(APPS_SCRIPT_URL);
+        if (cancelled || !raw?.game) return;
+        const next: LiveResponse = {
+          ...raw,
+          game: {
+            ...raw.game,
+            lastOutcome: normalizeOutcome(raw.game.lastOutcome),
+            pbp: normalizePBPEvents(raw.game.pbp),
+          },
+        };
 
         if (next.game.throwNum > throwNumRef.current) {
           const latest = next.game.pbp[next.game.pbp.length - 1];

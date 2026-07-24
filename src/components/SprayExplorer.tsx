@@ -57,7 +57,7 @@ export function SprayExplorer({
       {events.length > 0 ? (
         <>
           <SprayChart events={events} view={view} filter={filter} teamA={teamA} teamB={teamB} showGrid />
-          {view === "spray" && <SprayLegend className="mt-3" />}
+          <SprayLegend className="mt-3" />
         </>
       ) : (
         <div className="border border-dashed border-bg-border px-6 py-14 text-center">

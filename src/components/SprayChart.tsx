@@ -166,23 +166,22 @@ export function SprayChart({
           <circle key={i} cx={cx} cy={cy} r={7} fill="none" stroke="var(--color-accent)" strokeWidth={1.5} />
         ))}
 
-        {view === "spray" &&
-          filtered.map((e, i) => (
-            <circle
-              key={i}
-              cx={e.x * W}
-              cy={e.y * H}
-              r={3.5}
-              fill={OUTCOME_COLOR[e.outcome]}
-              fillOpacity={e.outcome === "fault" ? 0.5 : 0.9}
-              stroke="var(--color-bg)"
-              strokeWidth={0.75}
-            >
-              <title>
-                {`#${e.n} ${e.thrower} → ${OUTCOME_LABEL[e.outcome]}`}
-              </title>
-            </circle>
-          ))}
+        {filtered.map((e, i) => (
+          <circle
+            key={i}
+            cx={e.x * W}
+            cy={e.y * H}
+            r={3.5}
+            fill={OUTCOME_COLOR[e.outcome]}
+            fillOpacity={e.outcome === "fault" ? 0.5 : 0.9}
+            stroke="var(--color-bg)"
+            strokeWidth={0.75}
+          >
+            <title>
+              {`#${e.n} ${e.thrower} → ${OUTCOME_LABEL[e.outcome]}`}
+            </title>
+          </circle>
+        ))}
       </svg>
     </div>
   );

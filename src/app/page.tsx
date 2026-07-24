@@ -13,7 +13,10 @@ export default async function Home() {
   const featured = [...standings].sort((a, b) => b.overall - a.overall)[0];
   const topThree = [...standings].sort((a, b) => b.bdwar - a.bdwar).slice(0, 3);
   const latestNews = news.slice(0, 2);
-  const isLive = live?.game?.status === "LIVE";
+  // Status flips to LIVE as soon as a game is set up, before the first throw — only
+  // treat it as "live" for the banner once a throw has actually been recorded.
+  const hasLiveGame = live?.game?.status === "LIVE" && live.game.throwNum > 0;
+  const topNewsItem = news[0];
 
   return (
     <main>
@@ -42,7 +45,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {isLive && (
+      {hasLiveGame ? (
         <Link
           href="/live"
           className="flex items-center justify-center gap-3 bg-accent px-4 py-3 font-sans text-xs font-semibold uppercase tracking-widest2 text-white hover:bg-accent-dim"
@@ -51,6 +54,16 @@ export default async function Home() {
           Live now — {live!.game.teamA.join(" / ")} {live!.game.scoreA}–{live!.game.scoreB}{" "}
           {live!.game.teamB.join(" / ")}
         </Link>
+      ) : (
+        topNewsItem && (
+          <Link
+            href={`/news/${topNewsItem.id}`}
+            className="flex items-center justify-center gap-3 border-b border-bg-border bg-bg-surface px-4 py-3 font-sans text-xs font-semibold uppercase tracking-widest2 text-ink-dim hover:text-accent"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+            {topNewsItem.headline}
+          </Link>
+        )
       )}
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
