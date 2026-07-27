@@ -4,6 +4,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { StatBlock } from "@/components/ui/StatBlock";
 import { SprayExplorer } from "@/components/SprayExplorer";
+import { CollapsibleBio } from "@/components/ui/CollapsibleBio";
 import { PartnershipTable, EmptyState } from "@/components/PartnershipTable";
 import { getPartnerships, getPlayer, partnershipSlug } from "@/lib/api";
 import { dedupePBP, groupPBPByGame } from "@/lib/stats";
@@ -46,7 +47,7 @@ export default async function TeamPage({ params }: { params: { slug: string } })
           <Avatar src={partnership.photoB} alt={partnership.playerB} size="xl" ring />
         </div>
         <div>
-          <h1 className="font-display text-3xl font-bold uppercase tracking-tight text-ink">
+          <h1 className="font-display text-3xl font-bold uppercase tracking-tight text-brandBlue">
             {partnership.playerA} <span className="text-accent">&amp;</span> {partnership.playerB}
           </h1>
           <p className="mt-1 font-mono text-sm text-ink-dim">
@@ -65,6 +66,10 @@ export default async function TeamPage({ params }: { params: { slug: string } })
           <StatBlock label="CTR Together" value={partnership.ctrTogether.toFixed(3)} size="md" />
         </div>
       </section>
+
+      <div className="mb-12">
+        <CollapsibleBio bio={partnership.bio} />
+      </div>
 
       <section className="mb-12">
         <SectionHeader title="Spray Chart" subtitle="Shared offense" className="mb-4" />

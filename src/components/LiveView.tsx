@@ -39,7 +39,8 @@ export function LiveView({ initial }: { initial: LiveResponse | null }) {
         };
 
         if (next.game.throwNum > throwNumRef.current) {
-          const latest = next.game.pbp[next.game.pbp.length - 1];
+          // The Apps Script already returns pbp newest-first (last 20, reversed).
+          const latest = next.game.pbp[0];
           if (latest) {
             if (flashTimer.current) clearTimeout(flashTimer.current);
             setFlash({ event: latest, key: Date.now() });
@@ -81,6 +82,7 @@ export function LiveView({ initial }: { initial: LiveResponse | null }) {
     ? teamBPlayers.reduce((s, p) => s + p.ppt, 0) / teamBPlayers.length
     : 0;
   const prob = winProb(game.scoreA, game.scoreB, game.scoreTgt, teamAPPT, teamBPPT);
+  const photoByName = new Map(game.players.map((p) => [p.name, p.photo]));
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -236,13 +238,18 @@ export function LiveView({ initial }: { initial: LiveResponse | null }) {
         </summary>
         {game.pbp.length > 0 ? (
           <ul className="divide-y divide-bg-border">
-            {[...game.pbp].reverse().map((e) => (
+            {/* Apps Script already returns this newest-first */}
+            {game.pbp.map((e) => (
               <li key={e.n} className="flex items-center gap-3 px-4 py-2.5 font-mono text-sm">
                 <span
                   className="h-2.5 w-2.5 shrink-0 rounded-full"
                   style={{ background: OUTCOME_COLOR[e.outcome], opacity: e.outcome === "fault" ? 0.5 : 1 }}
                 />
                 <span className="text-ink-faint">#{e.n}</span>
+                <div className="flex -space-x-2">
+                  <Avatar src={photoByName.get(e.thrower)} alt={e.thrower} size="xs" className="ring-2 ring-bg" />
+                  <Avatar src={photoByName.get(e.defender)} alt={e.defender} size="xs" className="ring-2 ring-bg" />
+                </div>
                 <span className="flex-1 text-ink">
                   {e.thrower} → {OUTCOME_LABEL[e.outcome]}
                 </span>

@@ -15,6 +15,9 @@
   --color-ink: #15140f;
   --color-ink-dim: #56554e;
   --color-ink-faint: #8f8d84;
+
+  --color-brand-blue: #002d72;
+  --color-brand-yellow: #eee77d;
 }
 
 * {

@@ -32,6 +32,8 @@ const config: Config = {
           dim: "var(--color-ink-dim)",
           faint: "var(--color-ink-faint)",
         },
+        brandBlue: "var(--color-brand-blue)",
+        brandYellow: "var(--color-brand-yellow)",
       },
       fontFamily: {
         display: ["var(--font-oswald)", "sans-serif"],

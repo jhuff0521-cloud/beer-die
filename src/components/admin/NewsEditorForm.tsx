@@ -6,6 +6,7 @@ import { clsx } from "@/lib/clsx";
 export function NewsEditorForm() {
   const [headline, setHeadline] = useState("");
   const [excerpt, setExcerpt] = useState("");
+  const [image, setImage] = useState("");
   const [body, setBody] = useState("");
   const [status, setStatus] = useState<{ ok: boolean; message: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -18,13 +19,14 @@ export function NewsEditorForm() {
       const res = await fetch("/api/admin/news", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ headline, excerpt, body }),
+        body: JSON.stringify({ headline, excerpt, image, body }),
       });
       const data = await res.json();
       setStatus({ ok: data.success, message: data.message });
       if (data.success) {
         setHeadline("");
         setExcerpt("");
+        setImage("");
         setBody("");
       }
     } catch {
@@ -55,6 +57,17 @@ export function NewsEditorForm() {
           value={excerpt}
           onChange={(e) => setExcerpt(e.target.value)}
           className="w-full border border-bg-border bg-bg px-3 py-2 font-sans text-sm text-ink outline-none focus:border-accent"
+        />
+      </div>
+      <div>
+        <label className="mb-1 block font-sans text-[10px] font-semibold uppercase tracking-widest2 text-ink-faint">
+          Image URL
+        </label>
+        <input
+          value={image}
+          onChange={(e) => setImage(e.target.value)}
+          placeholder="https://..."
+          className="w-full border border-bg-border bg-bg px-3 py-2 font-mono text-sm text-ink outline-none focus:border-accent"
         />
       </div>
       <div>

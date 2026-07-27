@@ -6,6 +6,7 @@ import { StatBlock } from "@/components/ui/StatBlock";
 import { PlayerCard } from "@/components/PlayerCard";
 import { SprayExplorer } from "@/components/SprayExplorer";
 import { BdwarTrendChart } from "@/components/BdwarTrendChart";
+import { CollapsibleBio } from "@/components/ui/CollapsibleBio";
 import { getPartnerships, getPlayer, partnershipSlug } from "@/lib/api";
 import { groupPBPByGame } from "@/lib/stats";
 import { EmptyState } from "@/components/PartnershipTable";
@@ -70,6 +71,10 @@ export default async function PlayerPage({ params }: { params: { name: string } 
             <StatBlock label="Table Hits" value={player.tableHits} size="sm" />
           </div>
         </div>
+      </div>
+
+      <div className="mb-12">
+        <CollapsibleBio bio={player.bio} />
       </div>
 
       <section className="mb-12">

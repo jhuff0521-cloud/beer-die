@@ -106,6 +106,8 @@ function normalizePartnership(raw: Record<string, unknown>): Partnership | null 
     winPct,
     pptTogether: Number(raw.pptTogether ?? raw.ppt ?? 0),
     ctrTogether: Number(raw.ctrTogether ?? raw.ctr ?? 0),
+    bio: (raw.bio as string) ?? null,
+    recentForm: Array.isArray(raw.recentForm) ? (raw.recentForm as ("W" | "L")[]) : undefined,
   };
 }
 
@@ -144,12 +146,25 @@ export async function getPartnership(nameA: string, nameB: string): Promise<Part
   return normalized ? withPartnershipPhotoFallback(normalized, photoMap) : null;
 }
 
+function newsSlug(date: string, headline: string, index: number) {
+  const kebab = headline
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+  return `${date || "undated"}-${kebab || "article"}-${index}`;
+}
+
 export async function getNews(): Promise<NewsArticle[]> {
   const data = await callAppsScript<{ status: string; news: NewsArticle[] }>(
     { action: "get_news" },
     120
   );
-  return data?.news ?? [];
+  // The Apps Script doesn't send a unique id per article — derive a stable one from
+  // date + headline so routing (/news/[id]) and React keys work.
+  return (data?.news ?? []).map((a, i) => ({
+    ...a,
+    id: a.id || newsSlug(a.date, a.headline, i),
+  }));
 }
 
 export async function getLiveGame(): Promise<LiveResponse | null> {

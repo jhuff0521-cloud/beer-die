@@ -33,6 +33,7 @@ export interface PlayerStanding {
   dsr_rating: number;
   pbp?: PBPEvent[];
   partnerships?: Record<string, unknown>[];
+  bio?: string | null;
 }
 
 export interface PlayerSummary {
@@ -102,6 +103,10 @@ export interface Partnership {
   winPct: number;
   pptTogether: number;
   ctrTogether: number;
+  bio?: string | null;
+  /** Most recent games first, e.g. ["W", "L", "W", "W", "L"]. Not available until the Apps
+   *  Script exposes per-game history for a partnership — absent/undefined until then. */
+  recentForm?: ("W" | "L")[];
 }
 
 export interface NewsArticle {
@@ -111,4 +116,6 @@ export interface NewsArticle {
   body: string;
   date: string;
   author?: string;
+  image?: string | null;
 }
+

@@ -24,11 +24,15 @@ export default async function NewsArticlePage({ params }: { params: { id: string
         ← News
       </Link>
       <article>
+        {article.image && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={article.image} alt="" className="mb-6 aspect-video w-full object-cover" />
+        )}
         <div className="mb-3 font-mono text-xs uppercase tracking-widest2 text-ink-faint">
           {article.date}
           {article.author ? ` · ${article.author}` : ""}
         </div>
-        <h1 className="mb-6 font-display text-3xl font-bold leading-tight text-ink sm:text-4xl">
+        <h1 className="mb-6 font-display text-3xl font-bold leading-tight text-brandBlue sm:text-4xl">
           {article.headline}
         </h1>
         <div className="whitespace-pre-line font-sans text-base leading-relaxed text-ink-dim">
