@@ -34,6 +34,35 @@ export interface PlayerStanding {
   pbp?: PBPEvent[];
   partnerships?: Record<string, unknown>[];
   bio?: string | null;
+  bdwarHistory?: BdwarHistoryEntry[];
+  gameLog?: GameLogEntry[];
+}
+
+export interface BdwarHistoryEntry {
+  game: number;
+  date: string;
+  win: 0 | 1;
+  bdwar: number;
+  ppt: number;
+  scoreDiff: number;
+}
+
+export interface GameLogEntry {
+  date: string;
+  partner: string;
+  win: 0 | 1;
+  scoreFor: number;
+  scoreAgainst: number;
+  throws: number;
+  sinks: number;
+  cupHits: number;
+  tableHits: number;
+  faults: number;
+  catchOpp: number;
+  catches: number;
+  oppPts: number;
+  hlThrows: number;
+  hlSinks: number;
 }
 
 export interface PlayerSummary {
@@ -116,6 +145,7 @@ export interface NewsArticle {
   body: string;
   date: string;
   author?: string;
-  image?: string | null;
+  imageUrl?: string | null;
+  featured?: boolean;
 }
 

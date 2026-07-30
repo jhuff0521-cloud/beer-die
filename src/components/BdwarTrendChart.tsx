@@ -1,37 +1,53 @@
 "use client";
 
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import type { GameLine } from "@/lib/stats";
+import { Area, AreaChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { EmptyState } from "@/components/PartnershipTable";
+import type { BdwarHistoryEntry } from "@/lib/types";
 
-export function BdwarTrendChart({ games }: { games: GameLine[] }) {
-  if (games.length === 0) {
-    return (
-      <div className="border border-dashed border-bg-border px-6 py-14 text-center">
-        <p className="font-sans text-sm text-ink-faint">
-          Not enough game history yet to plot a trend.
-        </p>
-      </div>
-    );
+function TrendDot(props: { cx?: number; cy?: number; payload?: BdwarHistoryEntry }) {
+  const { cx, cy, payload } = props;
+  if (cx === undefined || cy === undefined || !payload) return null;
+  const won = payload.win === 1;
+  return (
+    <circle
+      cx={cx}
+      cy={cy}
+      r={3.5}
+      fill={won ? "#16a34a" : "var(--color-accent)"}
+      stroke="var(--color-bg)"
+      strokeWidth={1}
+    />
+  );
+}
+
+export function BdwarTrendChart({ bdwarHistory }: { bdwarHistory: BdwarHistoryEntry[] }) {
+  if (bdwarHistory.length < 3) {
+    return <EmptyState message="Not enough data yet." />;
   }
-
-  const data = games.map((g) => ({ date: g.date, bdwar: Math.round(g.bdwar * 1000) / 1000 }));
 
   return (
     <div className="h-64 w-full border border-bg-border bg-bg-raised p-4">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+        <AreaChart data={bdwarHistory} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+          <defs>
+            <linearGradient id="bdwarFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--color-accent)" stopOpacity={0.15} />
+              <stop offset="100%" stopColor="var(--color-accent)" stopOpacity={0} />
+            </linearGradient>
+          </defs>
           <XAxis
-            dataKey="date"
-            tick={{ fontSize: 10, fill: "var(--color-ink-faint)", fontFamily: "var(--font-geist-mono)" }}
+            dataKey="game"
+            tick={{ fontSize: 10, fill: "var(--color-ink-faint)", fontFamily: "var(--font-geist-sans)" }}
             axisLine={{ stroke: "var(--color-bg-border)" }}
             tickLine={false}
           />
           <YAxis
-            tick={{ fontSize: 10, fill: "var(--color-ink-faint)", fontFamily: "var(--font-geist-mono)" }}
+            tick={{ fontSize: 10, fill: "var(--color-ink-faint)", fontFamily: "var(--font-geist-sans)" }}
             axisLine={{ stroke: "var(--color-bg-border)" }}
             tickLine={false}
             width={40}
           />
+          <ReferenceLine y={0} stroke="var(--color-ink-faint)" strokeDasharray="4 3" />
           <Tooltip
             contentStyle={{
               background: "var(--color-bg)",
@@ -40,16 +56,18 @@ export function BdwarTrendChart({ games }: { games: GameLine[] }) {
               fontSize: 12,
               fontFamily: "var(--font-geist-mono)",
             }}
-            labelStyle={{ color: "var(--color-ink)" }}
+            labelFormatter={(g) => `Game ${g}`}
+            formatter={(value: any) => Number(value).toFixed(3)}
           />
-          <Line
+          <Area
             type="monotone"
             dataKey="bdwar"
             stroke="var(--color-accent)"
             strokeWidth={2}
-            dot={{ r: 3, fill: "var(--color-accent)" }}
+            fill="url(#bdwarFill)"
+            dot={<TrendDot />}
           />
-        </LineChart>
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );

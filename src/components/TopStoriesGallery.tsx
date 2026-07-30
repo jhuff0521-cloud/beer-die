@@ -6,9 +6,17 @@ import { clsx } from "@/lib/clsx";
 import type { NewsArticle } from "@/lib/types";
 
 const MAX_STORIES = 6;
+const FALLBACK_COUNT = 4;
+
+function pickStories(articles: NewsArticle[]): NewsArticle[] {
+  const withImage = articles.filter((a) => a.imageUrl);
+  const featured = withImage.filter((a) => a.featured);
+  if (featured.length > 0) return featured.slice(0, MAX_STORIES);
+  return withImage.slice(0, FALLBACK_COUNT);
+}
 
 export function TopStoriesGallery({ articles }: { articles: NewsArticle[] }) {
-  const stories = articles.filter((a) => a.image).slice(0, MAX_STORIES);
+  const stories = pickStories(articles);
   const trackRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [active, setActive] = useState(0);
@@ -52,7 +60,7 @@ export function TopStoriesGallery({ articles }: { articles: NewsArticle[] }) {
             className="relative aspect-[16/9] w-[88%] shrink-0 snap-start overflow-hidden bg-bg-raised sm:w-[70%] lg:w-[62%]"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={a.image!} alt={a.headline} className="absolute inset-0 h-full w-full object-cover" />
+            <img src={a.imageUrl!} alt={a.headline} className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
 
             <Link href={`/news/${a.id}`} className="absolute inset-0 flex flex-col justify-end p-5 sm:p-8">

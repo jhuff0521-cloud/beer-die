@@ -20,9 +20,9 @@ export default async function NewsPage() {
               href={`/news/${a.id}`}
               className="block border border-bg-border bg-bg-raised hover:border-accent"
             >
-              {a.image && (
+              {a.imageUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={a.image} alt="" className="aspect-video w-full object-cover" />
+                <img src={a.imageUrl} alt="" className="aspect-video w-full object-cover" />
               )}
               <div className="p-5">
                 <div className="mb-2 font-mono text-[10px] uppercase tracking-widest2 text-ink-faint">{a.date}</div>

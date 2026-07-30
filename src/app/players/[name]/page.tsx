@@ -6,6 +6,10 @@ import { StatBlock } from "@/components/ui/StatBlock";
 import { PlayerCard } from "@/components/PlayerCard";
 import { SprayExplorer } from "@/components/SprayExplorer";
 import { BdwarTrendChart } from "@/components/BdwarTrendChart";
+import { RollingPptChart } from "@/components/RollingPptChart";
+import { ClutchSplitCards } from "@/components/ClutchSplitCards";
+import { ThrowFatigueChart } from "@/components/ThrowFatigueChart";
+import { MatchupBreakdownTable } from "@/components/MatchupBreakdownTable";
 import { CollapsibleBio } from "@/components/ui/CollapsibleBio";
 import { getPartnerships, getPlayer, partnershipSlug } from "@/lib/api";
 import { groupPBPByGame } from "@/lib/stats";
@@ -84,8 +88,13 @@ export default async function PlayerPage({ params }: { params: { name: string } 
 
       <section className="mb-12">
         <SectionHeader title="BDWAR Trend" subtitle="By game" className="mb-4" />
-        <BdwarTrendChart games={games} />
+        <BdwarTrendChart bdwarHistory={player.bdwarHistory ?? []} />
       </section>
+
+      <RollingPptChart gameLog={player.gameLog ?? []} />
+      <ClutchSplitCards player={player} gameLog={player.gameLog ?? []} />
+      <ThrowFatigueChart pbp={pbp} name={player.name} careerPpt={player.ppt} />
+      <MatchupBreakdownTable pbp={pbp} name={player.name} seasonPpt={player.ppt} />
 
       <section className="mb-12">
         <SectionHeader title="Game Log" className="mb-4" />

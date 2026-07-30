@@ -6,7 +6,8 @@ import { clsx } from "@/lib/clsx";
 export function NewsEditorForm() {
   const [headline, setHeadline] = useState("");
   const [excerpt, setExcerpt] = useState("");
-  const [image, setImage] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [featured, setFeatured] = useState(false);
   const [body, setBody] = useState("");
   const [status, setStatus] = useState<{ ok: boolean; message: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -19,14 +20,15 @@ export function NewsEditorForm() {
       const res = await fetch("/api/admin/news", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ headline, excerpt, image, body }),
+        body: JSON.stringify({ headline, excerpt, imageUrl, featured, body }),
       });
       const data = await res.json();
       setStatus({ ok: data.success, message: data.message });
       if (data.success) {
         setHeadline("");
         setExcerpt("");
-        setImage("");
+        setImageUrl("");
+        setFeatured(false);
         setBody("");
       }
     } catch {
@@ -64,12 +66,21 @@ export function NewsEditorForm() {
           Image URL
         </label>
         <input
-          value={image}
-          onChange={(e) => setImage(e.target.value)}
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
           placeholder="https://..."
           className="w-full border border-bg-border bg-bg px-3 py-2 font-mono text-sm text-ink outline-none focus:border-accent"
         />
       </div>
+      <label className="flex cursor-pointer items-center gap-2 font-sans text-xs font-semibold uppercase tracking-widest2 text-ink-dim">
+        <input
+          type="checkbox"
+          checked={featured}
+          onChange={(e) => setFeatured(e.target.checked)}
+          className="accent-accent"
+        />
+        Featured (shows in the home page top-stories gallery)
+      </label>
       <div>
         <label className="mb-1 block font-sans text-[10px] font-semibold uppercase tracking-widest2 text-ink-faint">
           Body

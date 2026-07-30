@@ -1,6 +1,6 @@
 import type { PBPEvent } from "./types";
 
-function pointsFor(outcome: PBPEvent["outcome"]) {
+export function pointsFor(outcome: PBPEvent["outcome"]) {
   if (outcome === "sink") return 3;
   if (outcome === "cupHit") return 2;
   if (outcome === "tableHit") return 1;

@@ -24,9 +24,9 @@ export default async function NewsArticlePage({ params }: { params: { id: string
         ← News
       </Link>
       <article>
-        {article.image && (
+        {article.imageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={article.image} alt="" className="mb-6 aspect-video w-full object-cover" />
+          <img src={article.imageUrl} alt="" className="mb-6 aspect-video w-full object-cover" />
         )}
         <div className="mb-3 font-mono text-xs uppercase tracking-widest2 text-ink-faint">
           {article.date}

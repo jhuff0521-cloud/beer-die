@@ -11,7 +11,8 @@ export async function POST(req: Request) {
   const headline = typeof body?.headline === "string" ? body.headline.trim() : "";
   const articleBody = typeof body?.body === "string" ? body.body.trim() : "";
   const excerpt = typeof body?.excerpt === "string" ? body.excerpt.trim() : "";
-  const image = typeof body?.image === "string" ? body.image.trim() : "";
+  const imageUrl = typeof body?.imageUrl === "string" ? body.imageUrl.trim() : "";
+  const featured = Boolean(body?.featured);
   if (!headline || !articleBody) {
     return NextResponse.json(
       { success: false, message: "Headline and body are required." },
@@ -27,7 +28,8 @@ export async function POST(req: Request) {
         action: "add_news",
         headline,
         excerpt,
-        image,
+        imageUrl,
+        featured,
         body: articleBody,
         date: new Date().toISOString().slice(0, 10),
       }),

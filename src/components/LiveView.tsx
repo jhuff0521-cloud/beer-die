@@ -5,6 +5,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { SprayExplorer } from "@/components/SprayExplorer";
 import { OUTCOME_COLOR, OUTCOME_LABEL } from "@/components/SprayChart";
+import { MatchMomentumChart } from "@/components/MatchMomentumChart";
 import { EmptyState } from "@/components/PartnershipTable";
 import { APPS_SCRIPT_URL } from "@/lib/api";
 import { fetchFromSheet } from "@/lib/jsonp";
@@ -229,6 +230,9 @@ export function LiveView({ initial }: { initial: LiveResponse | null }) {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="border-t border-bg-border p-4">
+          <MatchMomentumChart pbp={game.pbp} scoreTgt={Number(game.scoreTgt)} teamAName={game.teamA.join(" / ")} />
         </div>
       </details>
 
